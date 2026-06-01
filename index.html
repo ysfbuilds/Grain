@@ -495,6 +495,17 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
 </div>
 </div>
 
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-title" style="font-size:14px;font-weight:600;line-height:1.5;margin-bottom:18px" id="confirmMsg"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="modal-save" style="background:var(--red)" onclick="doConfirm()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <!-- Rename Modal -->
 <div class="modal-overlay" id="renameOverlay">
   <div class="modal">
@@ -824,9 +835,10 @@ function autoSave(){
 }
 
 function deleteNote(){
-  if(!confirm('Delete this note?')) return;
-  gs.notes[currentTopicId]=(gs.notes[currentTopicId]||[]).filter(n=>n.id!==currentNoteId);
-  gsSave(); backToNoteList();
+  openConfirm('Delete this note?', ()=>{
+    gs.notes[currentTopicId]=(gs.notes[currentTopicId]||[]).filter(n=>n.id!==currentNoteId);
+    gsSave(); backToNoteList();
+  });
 }
 
 // editor keybindings
@@ -1022,10 +1034,11 @@ function saveSpace(){
   gsSave(); closeAddSpace(); renderSpaceNav();
 }
 function deleteSpace(id){
-  if(!confirm('Remove this space and all its topics? Notes will be kept.')) return;
-  gs.spaces=gs.spaces.filter(s=>s.id!==id);
-  currentSpaceId=gs.spaces[0]?.id||null;
-  gsSave(); renderSpaceNav(); switchView('space',document.querySelector('.nav-item[data-space]'));
+  openConfirm('Remove this space? Topics and notes will be deleted.', ()=>{
+    gs.spaces=gs.spaces.filter(s=>s.id!==id);
+    currentSpaceId=gs.spaces[0]?.id||null;
+    gsSave(); renderSpaceNav(); switchView('space',document.querySelector('.nav-item[data-space]'));
+  });
 }
 
 // ── Add Topic ──
@@ -1069,20 +1082,35 @@ function saveRename(){
 
 // ── Delete topic ──
 function deleteTopic(id){
-  if(!confirm('Delete this topic and all its notes?')) return;
   const space=gs.spaces.find(s=>s.id===currentSpaceId);
   if(!space) return;
-  space.topics=space.topics.filter(t=>t.id!==id);
-  delete gs.notes[id];
-  gsSave(); renderSpaceHome(); renderSpaceNav();
+  const topic=space.topics.find(t=>t.id===id);
+  if(!topic) return;
+  const noteCount=(gs.notes[id]||[]).length;
+  const msg=noteCount>0?`Delete "${topic.name}" and its ${noteCount} note${noteCount!==1?'s':''}? Cannot be undone.`:`Delete topic "${topic.name}"?`;
+  openConfirm(msg,()=>{
+    space.topics=space.topics.filter(t=>t.id!==id);
+    delete gs.notes[id];
+    gsSave(); renderSpaceHome(); renderSpaceNav();
+  });
 }
+
+// ── Inline confirm ──
+let confirmCallback=null;
+function openConfirm(msg,cb){
+  confirmCallback=cb;
+  document.getElementById('confirmMsg').textContent=msg;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('open'); confirmCallback=null; }
+function doConfirm(){ if(confirmCallback) confirmCallback(); closeConfirm(); }
 
 // ── Modals keyboard ──
 document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{ if(e.target===e.currentTarget){ closeAddSpace(); closeAddTopic(); closeRename(); }});
+  o.addEventListener('click',e=>{ if(e.target===e.currentTarget){ closeAddSpace(); closeAddTopic(); closeRename(); closeConfirm(); }});
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ closeAddSpace(); closeAddTopic(); closeRename(); }
+  if(e.key==='Escape'){ closeAddSpace(); closeAddTopic(); closeRename(); closeConfirm(); }
   if(e.key==='Enter'&&document.getElementById('addSpaceOverlay').classList.contains('open')){ e.preventDefault(); saveSpace(); }
   if(e.key==='Enter'&&document.getElementById('addTopicOverlay').classList.contains('open')){ e.preventDefault(); saveTopic(); }
   if(e.key==='Enter'&&document.getElementById('renameOverlay').classList.contains('open')){ e.preventDefault(); saveRename(); }
