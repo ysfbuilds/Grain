@@ -369,6 +369,11 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
     <div class="review-badge" id="reviewBadge" style="display:none;margin-left:auto"></div>
   </div>
   <div class="sidebar-bottom">
+    <div style="display:flex;gap:5px">
+      <button class="add-space-btn" style="flex:1;justify-content:center;padding:7px 0;font-size:12px;font-weight:600;color:var(--gray5);border:1px solid var(--gray2);border-radius:var(--r)" onclick="exportData()">↑ Export</button>
+      <button class="add-space-btn" style="flex:1;justify-content:center;padding:7px 0;font-size:12px;font-weight:600;color:var(--gray5);border:1px solid var(--gray2);border-radius:var(--r)" onclick="document.getElementById('importFile').click()">↓ Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)"/>
+    </div>
   </div>
 </nav>
 
@@ -1118,6 +1123,39 @@ document.addEventListener('keydown',e=>{
 
 // ── Utils ──
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Export / Import ──
+function exportData(){
+  const data = JSON.stringify(gs, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url; a.download = `grain-backup-${date}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+function importData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try{
+      const data = JSON.parse(evt.target.result);
+      if(!data.spaces||!data.notes) throw new Error('Invalid');
+      openConfirm('Import this backup? Your current data will be replaced.', ()=>{
+        gs = data;
+        gsSave();
+        currentSpaceId = gs.spaces[0]?.id||null;
+        renderSpaceNav();
+        switchView('space', document.querySelector(`.nav-item[data-space="${currentSpaceId}"]`));
+      });
+    } catch(err){
+      alert('Invalid Grain backup file.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
 
 // ── Init ──
 renderSpaceNav();
