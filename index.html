@@ -115,9 +115,21 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
 .topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .topic-card{
   background:var(--white);border:1px solid var(--gray2);border-radius:var(--r-lg);
-  padding:16px;cursor:pointer;transition:all .12s;
+  padding:16px;cursor:pointer;transition:all .12s;position:relative;
 }
 .topic-card:hover{border-color:var(--gray3);box-shadow:0 2px 8px rgba(0,0,0,.06);transform:translateY(-1px)}
+.tc-menu{
+  position:absolute;top:10px;right:10px;display:none;gap:3px;
+}
+.topic-card:hover .tc-menu{display:flex}
+.tc-menu-btn{
+  width:24px;height:24px;border-radius:var(--r-sm);border:1px solid var(--gray2);
+  background:var(--white);cursor:pointer;font-size:11px;color:var(--gray4);
+  display:flex;align-items:center;justify-content:center;transition:all .12s;
+  font-family:var(--font);
+}
+.tc-menu-btn:hover{background:var(--gray1);color:var(--black);border-color:var(--gray3)}
+.tc-menu-btn.del:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
 .tc-name{font-size:14px;font-weight:600;color:var(--black);margin-bottom:6px}
 .tc-count{font-size:12px;color:var(--gray4);margin-bottom:10px}
 .tc-state-bar{display:flex;gap:3px;height:4px;border-radius:4px;overflow:hidden}
@@ -483,6 +495,19 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
 </div>
 </div>
 
+<!-- Rename Modal -->
+<div class="modal-overlay" id="renameOverlay">
+  <div class="modal">
+    <div class="modal-title" id="renameModalTitle">Rename</div>
+    <label>New name</label>
+    <input type="text" id="rename-input" autocomplete="off" maxlength="50"/>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeRename()">Cancel</button>
+      <button class="modal-save" onclick="saveRename()">Rename</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Space Modal -->
 <div class="modal-overlay" id="addSpaceOverlay">
   <div class="modal">
@@ -597,7 +622,8 @@ function updateTopbarRight(){
     if(!space) return tr.innerHTML='';
     tr.innerHTML=`
       <button class="tb-btn tb-btn-ghost" onclick="openAddTopic()">+ Topic</button>
-      <button class="tb-btn tb-btn-ghost" onclick="deleteSpace('${space.id}')" style="color:var(--gray4)">Remove space</button>
+      <button class="tb-btn tb-btn-ghost" onclick="openRename('space','${space.id}','${esc(space.name)}')">Rename</button>
+      <button class="tb-btn tb-btn-ghost" onclick="deleteSpace('${space.id}')" style="color:var(--gray4)">Remove</button>
     `;
   } else tr.innerHTML='';
 }
@@ -662,6 +688,10 @@ function renderSpaceHome(){
     const card = document.createElement('div');
     card.className='topic-card';
     card.innerHTML=`
+      <div class="tc-menu">
+        <button class="tc-menu-btn" data-action="rename" title="Rename">✎</button>
+        <button class="tc-menu-btn del" data-action="delete" title="Delete">✕</button>
+      </div>
       <div class="tc-name">${esc(topic.name)}</div>
       <div class="tc-count">${notes.length} note${notes.length!==1?'s':''}</div>
       <div class="tc-state-bar">
@@ -676,7 +706,9 @@ function renderSpaceHome(){
         ${e?`<span class="tc-state-label"><div class="tc-state-dot" style="background:var(--amber)"></div>${e} exploring</span>`:''}
       </div>
     `;
-    card.onclick=()=>{ currentTopicId=topic.id; stateFilter='all'; switchView('notelist',null); };
+    card.querySelector('[data-action="rename"]').addEventListener('click', e=>{ e.stopPropagation(); openRename('topic', topic.id, topic.name); });
+    card.querySelector('[data-action="delete"]').addEventListener('click', e=>{ e.stopPropagation(); deleteTopic(topic.id); });
+    card.addEventListener('click', ()=>{ currentTopicId=topic.id; stateFilter='all'; switchView('notelist',null); });
     grid.appendChild(card);
   });
 }
@@ -1011,14 +1043,49 @@ function saveTopic(){
   gsSave(); closeAddTopic(); renderSpaceHome(); renderSpaceNav();
 }
 
+// ── Rename ──
+let renameTarget = null; // {type:'space'|'topic', id}
+function openRename(type, id, currentName){
+  renameTarget={type,id};
+  document.getElementById('renameModalTitle').textContent = type==='space'?'Rename space':'Rename topic';
+  document.getElementById('rename-input').value=currentName;
+  document.getElementById('renameOverlay').classList.add('open');
+  setTimeout(()=>{ const el=document.getElementById('rename-input'); el.focus(); el.select(); },50);
+}
+function closeRename(){ document.getElementById('renameOverlay').classList.remove('open'); renameTarget=null; }
+function saveRename(){
+  const name=(document.getElementById('rename-input').value||'').trim();
+  if(!name||!renameTarget) return;
+  if(renameTarget.type==='space'){
+    const space=gs.spaces.find(s=>s.id===renameTarget.id);
+    if(space){ space.name=name; gsSave(); renderSpaceNav(); renderSpaceHome(); updateTopbarRight(); updateBreadcrumb(); }
+  } else {
+    const space=gs.spaces.find(s=>s.id===currentSpaceId);
+    const topic=space?.topics?.find(t=>t.id===renameTarget.id);
+    if(topic){ topic.name=name; gsSave(); renderSpaceHome(); updateBreadcrumb(); }
+  }
+  closeRename();
+}
+
+// ── Delete topic ──
+function deleteTopic(id){
+  if(!confirm('Delete this topic and all its notes?')) return;
+  const space=gs.spaces.find(s=>s.id===currentSpaceId);
+  if(!space) return;
+  space.topics=space.topics.filter(t=>t.id!==id);
+  delete gs.notes[id];
+  gsSave(); renderSpaceHome(); renderSpaceNav();
+}
+
 // ── Modals keyboard ──
 document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{ if(e.target===e.currentTarget){ closeAddSpace(); closeAddTopic(); }});
+  o.addEventListener('click',e=>{ if(e.target===e.currentTarget){ closeAddSpace(); closeAddTopic(); closeRename(); }});
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ closeAddSpace(); closeAddTopic(); }
+  if(e.key==='Escape'){ closeAddSpace(); closeAddTopic(); closeRename(); }
   if(e.key==='Enter'&&document.getElementById('addSpaceOverlay').classList.contains('open')){ e.preventDefault(); saveSpace(); }
   if(e.key==='Enter'&&document.getElementById('addTopicOverlay').classList.contains('open')){ e.preventDefault(); saveTopic(); }
+  if(e.key==='Enter'&&document.getElementById('renameOverlay').classList.contains('open')){ e.preventDefault(); saveRename(); }
 });
 
 // ── Utils ──
