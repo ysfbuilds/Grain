@@ -418,6 +418,17 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
           <button class="fmt-btn" onclick="insertCode()" title="Code block">&lt;/&gt;</button>
           <button class="fmt-btn" onclick="fmtBlock('blockquote')" title="Quote">"</button>
           <div class="fmt-separator"></div>
+          <div style="position:relative;display:inline-block" id="colorPickerWrap">
+            <button class="fmt-btn" onclick="toggleColorPicker()" title="Text color" id="colorBtn" style="gap:3px;width:auto;padding:0 7px;font-size:11px;font-weight:700">A <span id="colorDot" style="width:8px;height:8px;border-radius:50%;background:#e03030;display:inline-block;flex-shrink:0"></span></button>
+            <div id="colorPicker" style="display:none;position:absolute;top:34px;right:0;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:50;display:none">
+              <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Text color</div>
+              <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;width:162px" id="colorSwatchGrid"></div>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+                <button onclick="applyColor(null)" style="font-size:11px;font-weight:600;color:var(--text2);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:var(--font);width:100%">Remove color</button>
+              </div>
+            </div>
+          </div>
+          <div class="fmt-separator"></div>
           <button class="tb-btn tb-btn-ghost" style="font-size:12px;padding:5px 10px" onclick="deleteNote()">Delete</button>
         </div>
       </div>
@@ -824,6 +835,76 @@ function saveNoteState(){
   sel.style.background=sc.bg; sel.style.color=sc.color;
   gsSave(); renderSpaceNav();
 }
+
+// ── Text color ──
+const TEXT_COLORS = [
+  {hex:'#e03030',name:'Red'},
+  {hex:'#e07830',name:'Orange'},
+  {hex:'#d4a017',name:'Gold'},
+  {hex:'#2d9a4f',name:'Green'},
+  {hex:'#1a6abf',name:'Blue'},
+  {hex:'#5a2d9a',name:'Purple'},
+  {hex:'#c0186a',name:'Pink'},
+  {hex:'#0a9488',name:'Teal'},
+  {hex:'#8a4a00',name:'Brown'},
+  {hex:'#555555',name:'Gray'},
+  {hex:'#0a0a0a',name:'Black'},
+  {hex:'#ffffff',name:'White',border:true},
+];
+let selectedTextColor = TEXT_COLORS[0].hex;
+let colorPickerOpen = false;
+let savedRange = null;
+
+function saveSelection(){
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount > 0) savedRange = sel.getRangeAt(0).cloneRange();
+}
+
+function restoreSelection(){
+  if(!savedRange) return;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(savedRange);
+}
+
+function initColorPicker(){
+  const grid = document.getElementById('colorSwatchGrid');
+  if(!grid) return;
+  grid.innerHTML = TEXT_COLORS.map(c=>`
+    <div onclick="applyColor('${c.hex}')" title="${c.name}" style="width:24px;height:24px;border-radius:6px;background:${c.hex};cursor:pointer;border:${c.border?'1.5px solid var(--border)':'1.5px solid transparent'};transition:transform .1s;box-shadow:0 1px 3px rgba(0,0,0,.15)" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></div>
+  `).join('');
+}
+
+function toggleColorPicker(){
+  saveSelection();
+  const picker = document.getElementById('colorPicker');
+  colorPickerOpen = !colorPickerOpen;
+  picker.style.display = colorPickerOpen ? 'block' : 'none';
+  if(colorPickerOpen) initColorPicker();
+}
+
+function applyColor(hex){
+  document.getElementById('colorPicker').style.display='none';
+  colorPickerOpen=false;
+  restoreSelection();
+  if(!hex){
+    document.execCommand('removeFormat',false,null);
+  } else {
+    document.execCommand('foreColor',false,hex);
+    selectedTextColor=hex;
+    document.getElementById('colorDot').style.background=hex;
+  }
+  savedRange=null;
+  autoSave();
+}
+
+// Close color picker on outside click
+document.addEventListener('click',e=>{
+  if(colorPickerOpen && !document.getElementById('colorPickerWrap')?.contains(e.target)){
+    document.getElementById('colorPicker').style.display='none';
+    colorPickerOpen=false;
+  }
+});
 
 function autoSave(){
   clearTimeout(autoSaveTimer);
