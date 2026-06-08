@@ -990,6 +990,14 @@ function saveLogEntry(){
   logActivity();
   gsSave();
   renderLog();
+  // Visual feedback
+  const btn = document.querySelector('.log-save-row .tb-btn-primary');
+  if(btn){
+    const orig = btn.textContent;
+    btn.textContent = '✓ Saved';
+    btn.style.background = 'var(--black)';
+    setTimeout(()=>{ btn.textContent = orig; btn.style.background = ''; }, 1200);
+  }
 }
 
 // ── Progress ──
