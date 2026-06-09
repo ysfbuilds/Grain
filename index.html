@@ -230,6 +230,38 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
 .editor-body blockquote{border-left:3px solid var(--gray3);padding-left:16px;color:var(--gray5);font-style:italic;margin:12px 0}
 
 /* ── Daily Log ── */
+.schedule-view{padding:28px 32px;max-width:600px;width:100%}
+.sch-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sch-title{font-family:var(--serif);font-size:22px;font-weight:400}
+.sch-nav{display:flex;align-items:center;gap:6px}
+.sch-nav-btn{width:30px;height:30px;border-radius:var(--r);border:1px solid var(--gray2);background:none;cursor:pointer;font-size:14px;color:var(--gray5);display:flex;align-items:center;justify-content:center;transition:all .1s;font-family:var(--font)}
+.sch-nav-btn:hover{background:var(--gray1);color:var(--black)}
+.sch-date{font-size:14px;font-weight:600;color:var(--black);min-width:140px;text-align:center}
+.sch-today-btn{font-size:11px;padding:4px 10px;border-radius:14px;border:1px solid var(--gray2);background:none;color:var(--gray5);cursor:pointer;font-family:var(--font);font-weight:600;transition:all .1s}
+.sch-today-btn:hover{background:var(--gray1);color:var(--black)}
+.sch-blocks{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;min-height:60px}
+.sch-block{display:flex;align-items:stretch;gap:0;border-radius:var(--r);overflow:hidden;border:1px solid var(--gray2);background:var(--white);transition:all .12s}
+.sch-block:hover{border-color:var(--gray3);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.sch-block-color{width:4px;flex-shrink:0}
+.sch-block-body{flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.sch-block-top{display:flex;align-items:center;gap:8px}
+.sch-block-title{font-size:14px;font-weight:600;color:var(--black);flex:1}
+.sch-block-time{font-size:12px;color:var(--gray4);font-weight:500;white-space:nowrap}
+.sch-block-meta{display:flex;align-items:center;gap:6px}
+.sch-block-space{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.sch-block-note{font-size:12px;color:var(--gray5);font-style:italic}
+.sch-block-actions{display:none;padding:0 8px;align-items:center;gap:4px;flex-shrink:0}
+.sch-block:hover .sch-block-actions{display:flex}
+.sch-act-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--gray2);background:none;cursor:pointer;font-size:11px;color:var(--gray4);display:flex;align-items:center;justify-content:center;transition:all .1s}
+.sch-act-btn:hover{background:var(--gray1);color:var(--black)}
+.sch-act-btn.del:hover{background:#fef2f2;color:#dc2626;border-color:#fecaca}
+.sch-add-btn{width:100%;padding:10px;border-radius:var(--r);border:1px dashed var(--gray3);background:none;color:var(--gray4);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .12s}
+.sch-add-btn:hover{border-color:var(--gray5);color:var(--gray5);background:var(--gray1)}
+.sch-empty{text-align:center;padding:32px 16px;color:var(--gray3);font-size:13px}
+.blk-space-grid{display:flex;gap:5px;flex-wrap:wrap}
+.blk-space-btn{font-size:11px;padding:4px 10px;border-radius:14px;border:1px solid var(--gray2);background:none;color:var(--gray5);cursor:pointer;font-family:var(--font);font-weight:500;transition:all .1s}
+.blk-space-btn:hover{border-color:var(--gray3)}
+.blk-space-btn.on{background:var(--black);color:var(--white);border-color:var(--black)}
 .log-view{flex:1;overflow-y:auto;padding:40px 48px}
 .log-view::-webkit-scrollbar{width:4px}
 .log-view::-webkit-scrollbar-thumb{background:var(--gray3);border-radius:2px}
@@ -246,7 +278,13 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
 .log-entry-input::placeholder{color:var(--gray3)}
 .log-save-row{display:flex;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid var(--gray2)}
 .log-past{display:flex;flex-direction:column;gap:12px}
-.log-past-entry{background:var(--white);border:1px solid var(--gray2);border-radius:var(--r-lg);padding:16px 20px}
+.log-past-entry{background:var(--white);border:1px solid var(--gray2);border-radius:var(--r-lg);padding:16px 20px;position:relative}
+.lpe-edit-btn{display:none;position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--gray2);background:none;color:var(--gray4);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .1s}
+.lpe-edit-btn:hover{background:var(--gray1);color:var(--black)}
+.log-past-entry:hover .lpe-edit-btn{display:block}
+.lpe-edit-area{width:100%;background:var(--gray1);border:1px solid var(--gray2);border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--black);font-family:var(--font);outline:none;resize:vertical;line-height:1.7;min-height:80px;margin-top:8px}
+.lpe-edit-area:focus{border-color:var(--gray4);background:var(--white)}
+.lpe-edit-btns{display:flex;gap:6px;margin-top:8px}
 .lpe-date{font-size:11px;font-weight:600;color:var(--gray4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .lpe-text{font-size:14px;color:var(--gray5);line-height:1.7;white-space:pre-wrap}
 
@@ -355,6 +393,10 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
   <button class="add-space-btn" onclick="openAddSpace()">+ Add space</button>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">Tools</div>
+  <div class="nav-item" data-view="schedule" onclick="switchView('schedule',this)">
+    <div class="nav-dot" style="background:var(--gray3)"></div>
+    Schedule
+  </div>
   <div class="nav-item" data-view="log" onclick="switchView('log',this)">
     <div class="nav-dot" style="background:var(--gray3)"></div>
     Daily log
@@ -436,6 +478,51 @@ body{font-family:var(--font);background:var(--white);color:var(--black);font-siz
         <input class="editor-title-input" id="editorTitle" placeholder="Note title…" autocomplete="off" oninput="autoSave()"/>
         <div class="editor-meta" id="editorMeta"></div>
         <div class="editor-body" id="editorBody" contenteditable="true" data-placeholder="Start writing…" spellcheck="true"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule view -->
+  <div class="view" id="view-schedule">
+    <div class="schedule-view">
+      <div class="sch-header">
+        <div class="sch-title">Schedule</div>
+        <div class="sch-nav">
+          <button class="sch-nav-btn" onclick="schPrevDay()">←</button>
+          <div class="sch-date" id="schDate"></div>
+          <button class="sch-nav-btn" onclick="schNextDay()">→</button>
+          <button class="sch-today-btn" onclick="schGoToday()">Today</button>
+        </div>
+      </div>
+      <div class="sch-blocks" id="schBlocks"></div>
+      <button class="sch-add-btn" onclick="openAddBlock()">+ Add time block</button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Block Modal -->
+  <div class="modal-overlay" id="blockOverlay">
+    <div class="modal">
+      <div class="modal-title" id="blockModalTitle">Add time block</div>
+      <label for="blk-title">What are you doing?</label>
+      <input type="text" id="blk-title" placeholder="e.g. Study CVE research, Quran review" autocomplete="off"/>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <div style="flex:1">
+          <label for="blk-start">Start time</label>
+          <input type="time" id="blk-start" style="width:100%"/>
+        </div>
+        <div style="flex:1">
+          <label for="blk-end">End time</label>
+          <input type="time" id="blk-end" style="width:100%"/>
+        </div>
+      </div>
+      <label style="margin-top:6px">Space</label>
+      <div class="blk-space-grid" id="blkSpaceGrid"></div>
+      <label for="blk-notes" style="margin-top:6px">Notes (optional)</label>
+      <input type="text" id="blk-notes" placeholder="Any details..." autocomplete="off"/>
+      <input type="hidden" id="blk-edit-id"/>
+      <div class="modal-btns">
+        <button class="modal-cancel" onclick="closeBlockModal()">Cancel</button>
+        <button class="modal-save" onclick="saveBlock()">Save</button>
       </div>
     </div>
   </div>
@@ -614,6 +701,7 @@ function switchView(view, navEl){
   if(view==='space'){ document.getElementById('view-space').classList.add('active'); renderSpaceHome(); }
   else if(view==='notelist'){ document.getElementById('view-notelist').classList.add('active'); renderNoteList(); }
   else if(view==='editor'){ document.getElementById('view-editor').classList.add('active'); }
+  else if(view==='schedule'){ document.getElementById('view-schedule').classList.add('active'); renderSchedule(); }
   else if(view==='log'){ document.getElementById('view-log').classList.add('active'); renderLog(); }
   else if(view==='progress'){ document.getElementById('view-progress').classList.add('active'); renderProgress(); }
   else if(view==='review'){ document.getElementById('view-review').classList.add('active'); renderReview(); }
@@ -637,6 +725,7 @@ function updateBreadcrumb(){
     const topic = space?.topics?.find(t=>t.id===currentTopicId);
     bc.innerHTML=`<span>${space?.name||''}</span> <span style="color:var(--gray3)">/</span> <span>${topic?.name||''}</span> <span style="color:var(--gray3)">/</span> <span>${note?.title||'Untitled'}</span>`;
   } else if(currentView==='log') bc.innerHTML=`<span>Daily log</span>`;
+  else if(currentView==='schedule') bc.innerHTML=`<span>Schedule</span>`;
   else if(currentView==='progress') bc.innerHTML=`<span>Progress</span>`;
   else if(currentView==='review') bc.innerHTML=`<span>Weekly review</span>`;
   else bc.innerHTML='';
@@ -977,10 +1066,33 @@ function renderLog(){
   const past = document.getElementById('logPast');
   const entries = Object.entries(gs.log).filter(([k])=>k!==todayKey).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,30);
   if(!entries.length){ past.innerHTML=''; return; }
-  past.innerHTML='<div style="font-size:13px;font-weight:600;color:var(--black);margin-bottom:12px">Past entries</div>'+entries.map(([date,text])=>{
-    const d=new Date(date);
-    return `<div class="log-past-entry"><div class="lpe-date">${d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="lpe-text">${esc(text)}</div></div>`;
-  }).join('');
+  past.innerHTML='<div style="font-size:13px;font-weight:600;color:var(--black);margin-bottom:12px">Past entries</div>';
+  entries.forEach(([date,text])=>{
+    const d=new Date(date+'T00:00:00');
+    const el=document.createElement('div');
+    el.className='log-past-entry';
+    el.innerHTML=`<div class="lpe-date">${d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div class="lpe-text" id="lpe-text-${date}">${esc(text)}</div><button class="lpe-edit-btn" id="lpe-btn-${date}">Edit</button>`;
+    el.querySelector('.lpe-edit-btn').addEventListener('click',()=>editPastLog(date));
+    past.appendChild(el);
+  });
+}
+
+function editPastLog(date){
+  const textEl=document.getElementById('lpe-text-'+date);
+  const btnEl=document.getElementById('lpe-btn-'+date);
+  if(!textEl) return;
+  const current=gs.log[date]||'';
+  btnEl.style.display='none';
+  textEl.innerHTML=`<textarea class="lpe-edit-area" id="lpe-edit-${date}">${esc(current)}</textarea><div class="lpe-edit-btns"><button class="tb-btn tb-btn-primary" style="font-size:12px;padding:5px 14px" onclick="savePastLog('${date}')">Save</button><button class="tb-btn" style="font-size:12px;padding:5px 14px" onclick="renderLog()">Cancel</button></div>`;
+  document.getElementById('lpe-edit-'+date).focus();
+}
+
+function savePastLog(date){
+  const val=(document.getElementById('lpe-edit-'+date).value||'').trim();
+  if(val) gs.log[date]=val;
+  else delete gs.log[date];
+  gsSave();
+  renderLog();
 }
 
 function saveLogEntry(){
@@ -1245,6 +1357,139 @@ function importData(e){
   reader.readAsText(file);
   e.target.value='';
 }
+
+// ── Schedule ──
+const SCH_COLORS = ['#0a0a0a','#2563eb','#16a34a','#d97706','#dc2626','#7c3aed','#0891b2','#be185d'];
+let schDate = today();
+
+function schPrevDay(){ const d=new Date(schDate); d.setDate(d.getDate()-1); schDate=d.toISOString().split('T')[0]; renderSchedule(); }
+function schNextDay(){ const d=new Date(schDate); d.setDate(d.getDate()+1); schDate=d.toISOString().split('T')[0]; renderSchedule(); }
+function schGoToday(){ schDate=today(); renderSchedule(); }
+
+function renderSchedule(){
+  if(!gs.schedule) gs.schedule={};
+  const dateEl=document.getElementById('schDate');
+  const d=new Date(schDate+'T00:00:00');
+  const isToday=schDate===today();
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  dateEl.textContent=(isToday?'Today — ':dayNames[d.getDay()]+', ')+monthNames[d.getMonth()]+' '+d.getDate();
+
+  const blocks=(gs.schedule[schDate]||[]).slice().sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+  const container=document.getElementById('schBlocks');
+  if(!blocks.length){
+    container.innerHTML='<div class="sch-empty">No blocks scheduled'+(isToday?' for today':'')+'.<br/>Add one below.</div>';
+    return;
+  }
+  container.innerHTML='';
+  blocks.forEach((blk,i)=>{
+    const space=gs.spaces.find(s=>s.id===blk.spaceId);
+    const spaceColor=SCH_COLORS[gs.spaces.indexOf(space)%SCH_COLORS.length]||'var(--gray3)';
+    const el=document.createElement('div');
+    el.className='sch-block';
+    el.innerHTML=`
+      <div class="sch-block-color" style="background:${spaceColor}"></div>
+      <div class="sch-block-body">
+        <div class="sch-block-top">
+          <div class="sch-block-title">${blk.title||'Untitled'}</div>
+          <div class="sch-block-time">${formatTime(blk.start)} – ${formatTime(blk.end)}</div>
+        </div>
+        <div class="sch-block-meta">
+          ${space?`<span class="sch-block-space" style="background:${spaceColor}15;color:${spaceColor}">${space.name}</span>`:''}
+          ${blk.notes?`<span class="sch-block-note">${blk.notes}</span>`:''}
+        </div>
+      </div>
+      <div class="sch-block-actions">
+        <button class="sch-act-btn" onclick="editBlock(${i})" title="Edit">✎</button>
+        <button class="sch-act-btn del" onclick="deleteBlock(${i})" title="Delete">✕</button>
+      </div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+function formatTime(t){
+  if(!t) return '';
+  const [h,m]=t.split(':').map(Number);
+  const ampm=h>=12?'PM':'AM';
+  const h12=h%12||12;
+  return h12+':'+(m<10?'0':'')+m+' '+ampm;
+}
+
+let blockEditIdx=-1;
+let blockSpaceId=null;
+
+function openAddBlock(){
+  blockEditIdx=-1;
+  blockSpaceId=gs.spaces.length?gs.spaces[0].id:null;
+  document.getElementById('blockModalTitle').textContent='Add time block';
+  document.getElementById('blk-title').value='';
+  document.getElementById('blk-start').value='09:00';
+  document.getElementById('blk-end').value='10:00';
+  document.getElementById('blk-notes').value='';
+  document.getElementById('blk-edit-id').value='';
+  renderBlockSpaces();
+  document.getElementById('blockOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('blk-title').focus(),50);
+}
+
+function editBlock(idx){
+  const blocks=gs.schedule[schDate]||[];
+  const blk=blocks[idx];
+  if(!blk) return;
+  blockEditIdx=idx;
+  blockSpaceId=blk.spaceId;
+  document.getElementById('blockModalTitle').textContent='Edit time block';
+  document.getElementById('blk-title').value=blk.title||'';
+  document.getElementById('blk-start').value=blk.start||'09:00';
+  document.getElementById('blk-end').value=blk.end||'10:00';
+  document.getElementById('blk-notes').value=blk.notes||'';
+  renderBlockSpaces();
+  document.getElementById('blockOverlay').classList.add('open');
+}
+
+function renderBlockSpaces(){
+  const grid=document.getElementById('blkSpaceGrid');
+  grid.innerHTML='';
+  gs.spaces.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='blk-space-btn'+(blockSpaceId===s.id?' on':'');
+    btn.textContent=s.name;
+    btn.onclick=()=>{ blockSpaceId=s.id; renderBlockSpaces(); };
+    grid.appendChild(btn);
+  });
+}
+
+function closeBlockModal(){ document.getElementById('blockOverlay').classList.remove('open'); }
+
+function saveBlock(){
+  const title=(document.getElementById('blk-title').value||'').trim();
+  if(!title){ document.getElementById('blk-title').focus(); return; }
+  const start=document.getElementById('blk-start').value;
+  const end=document.getElementById('blk-end').value;
+  const notes=(document.getElementById('blk-notes').value||'').trim();
+  if(!gs.schedule) gs.schedule={};
+  if(!gs.schedule[schDate]) gs.schedule[schDate]=[];
+  const blk={title,start,end,spaceId:blockSpaceId,notes:notes||null};
+  if(blockEditIdx>=0){
+    gs.schedule[schDate][blockEditIdx]=blk;
+  } else {
+    gs.schedule[schDate].push(blk);
+  }
+  gsSave();
+  closeBlockModal();
+  renderSchedule();
+}
+
+function deleteBlock(idx){
+  if(!gs.schedule[schDate]) return;
+  gs.schedule[schDate].splice(idx,1);
+  if(!gs.schedule[schDate].length) delete gs.schedule[schDate];
+  gsSave();
+  renderSchedule();
+}
+
+document.getElementById('blockOverlay').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeBlockModal(); });
 
 // ── Init ──
 renderSpaceNav();
